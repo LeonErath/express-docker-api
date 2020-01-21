@@ -1,5 +1,4 @@
 const express = require("express");
-const fetch = require("node-fetch");
 const Docker = require("dockerode");
 const helmet = require("helmet");
 const app = express();
@@ -12,7 +11,7 @@ app.use(helmet());
 
 const port = 3002;
 
-const docker = new Docker({ socketPath: "/var/run/docker.sock" });
+const docker = new Docker({ host: process.env.DOCKER_PORT, port: 4243 });
 
 app.get("/api/docker/containers", async (req, res) => {
 	docker.listContainers({ all: true }, (err, containers) => {

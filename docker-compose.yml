@@ -15,12 +15,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
-      - traefik.backend=eve
+      - traefik.backend=admin-api
       - traefik.frontend.rule=Host:admin.erath.dev;PathPrefix:/api/docker
       - traefik.docker.network=proxy
       - traefik.port=3002
       - traefik.enable=true
-      - com.centurylinklabs.watchtower.enable=true
     networks:
       - internal
       - proxy

@@ -18,4 +18,46 @@ app.get("/api/docker/containers", (req, res) => {
 	});
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.get("/api/docker/containers/:id", (req, res) => {
+	res.send(docker.getContainer(req.params.id));
+});
+
+app.post("/api/docker/containers/:id/stop", (req, res) => {
+	docker
+		.getContainer(req.params.id)
+		.stop()
+		.then(v => {
+			res.send(`Stopped container with id: ${req.params.id}`);
+		})
+		.catch(e => {
+			console.log(e);
+			res.send(`Could not stop container with id: ${req.params.id}`);
+		});
+});
+
+app.post("/api/docker/containers/:id/restart", (req, res) => {
+	docker
+		.getContainer(req.params.id)
+		.restart()
+		.then(v => {
+			res.send(`Restarted container with id: ${req.params.id}`);
+		})
+		.catch(e => {
+			console.log(e);
+			res.send(`Could not restart container with id: ${req.params.id}`);
+		});
+});
+
+app.post("/api/docker/containers/stop", (req, res) => {
+	docker.listContainers({ all: true }, (err, containers) => {
+		if (err) res.send({ error: err.message });
+		containers.forEach(containerInfo => {
+			docker.getContainer(containerInfo.Id).stop();
+		});
+	});
+	res.send(`Stopped all containers!`);
+});
+
+app.listen(port, () =>
+	console.log(`Express docker api listening on port ${port}!`)
+);

@@ -1,0 +1,26 @@
+version: "2"
+
+networks:
+  proxy:
+    external: true
+  internal:
+    external: false
+
+services:
+  eve:
+    build: .
+    restart: always
+    ports:
+      - "3002:3002"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.backend=eve
+      - traefik.frontend.rule=Host:leonerath.de,www.leonerath.de,erath.dev,wwww.erath.dev;PathPrefix:/api/docker
+      - traefik.docker.network=proxy
+      - traefik.port=3002
+      - traefik.enable=true
+      - com.centurylinklabs.watchtower.enable=true
+    networks:
+      - internal
+      - proxy

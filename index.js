@@ -1,25 +1,30 @@
 const express = require("express");
 const fetch = require("node-fetch");
 const Docker = require("dockerode");
+const helmet = require("helmet");
 const app = express();
 var cors = require("cors");
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use(helmet());
 
 const port = 3002;
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 
-app.get("/api/docker/containers", (req, res) => {
+app.get("/api/docker/containers", async (req, res) => {
 	docker.listContainers({ all: true }, (err, containers) => {
 		if (err) res.send({ error: err.message });
 		console.log("ALL: " + containers.length);
-		res.send(containers);
+		res.send({ containers });
 	});
 });
 
-app.get("/api/docker/containers/:id", (req, res) => {
-	res.send(docker.getContainer(req.params.id));
+app.get("/api/docker/containers/:id", async (req, res) => {
+	const container = await docker.getContainer(req.params.id);
+	res.send({ container });
 });
 
 app.post("/api/docker/containers/:id/stop", (req, res) => {

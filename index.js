@@ -13,7 +13,9 @@ const port = 3002;
 
 const docker = new Docker({ socketPath: "/var/run/docker.sock" });
 
-app.get("/api/docker/containers", async (req, res) => {
+const basePath = "/api/docker";
+
+app.get(basePath + "/containers", async (req, res) => {
 	docker.listContainers({ all: true }, (err, containers) => {
 		if (err) res.send({ error: err.message });
 		console.log("ALL: " + containers.length);
@@ -21,12 +23,12 @@ app.get("/api/docker/containers", async (req, res) => {
 	});
 });
 
-app.get("/api/docker/containers/:id", async (req, res) => {
+app.get(basePath + "/containers/:id", async (req, res) => {
 	const container = await docker.getContainer(req.params.id);
 	res.send({ container });
 });
 
-app.post("/api/docker/containers/:id/stop", (req, res) => {
+app.post(basePath + "/containers/:id/stop", (req, res) => {
 	docker
 		.getContainer(req.params.id)
 		.stop()
@@ -39,7 +41,7 @@ app.post("/api/docker/containers/:id/stop", (req, res) => {
 		});
 });
 
-app.post("/api/docker/containers/:id/restart", (req, res) => {
+app.post(basePath + "/containers/:id/restart", (req, res) => {
 	docker
 		.getContainer(req.params.id)
 		.restart()
@@ -52,7 +54,7 @@ app.post("/api/docker/containers/:id/restart", (req, res) => {
 		});
 });
 
-app.post("/api/docker/containers/stop", (req, res) => {
+app.post(basePath + "/containers/stop", (req, res) => {
 	docker.listContainers({ all: true }, (err, containers) => {
 		if (err) res.send({ error: err.message });
 		containers.forEach(containerInfo => {
